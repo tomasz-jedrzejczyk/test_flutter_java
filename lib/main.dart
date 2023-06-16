@@ -1,42 +1,39 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const SampleApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-
+class SampleApp extends StatelessWidget {
+  const SampleApp({super.key});
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Sample App test material app',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.green,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const SampleAppPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-
-  final String title;
+class SampleAppPage extends StatefulWidget {
+  const SampleAppPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<SampleAppPage> createState() => _SampleAppPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _SampleAppPageState extends State<SampleAppPage> {
+  // Default placeholder text.
+  String textToShow = 'I Like dupa';
 
-  void _incrementCounter() {
+  void _updateText() {
     setState(() {
-      _counter++;
+      // Update the text.
+      textToShow = 'Flutter is Awesome like shit!';
     });
   }
 
@@ -44,28 +41,35 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: const Text('Sample App test'),
+      ),
+      body: Center(child: Text(textToShow)),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _updateText,
+        tooltip: 'Update Text',
+        child: const Icon(Icons.update),
+      ),
+    );
+
+
+  }
+
+  @override
+  Widget build1(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Sample App'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.only(left: 20, right: 30),
+          ),
+          onPressed: () {},
+          child: const Text('Hello'),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
