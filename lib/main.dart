@@ -1,74 +1,62 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const SampleApp());
+  runApp(
+    const MaterialApp(
+      home: Page1(),
+    ),
+  );
 }
 
-class SampleApp extends StatelessWidget {
-  const SampleApp({super.key});
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Sample App test material app',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: const SampleAppPage(),
-    );
-  }
-}
-
-class SampleAppPage extends StatefulWidget {
-  const SampleAppPage({super.key});
-
-  @override
-  State<SampleAppPage> createState() => _SampleAppPageState();
-}
-
-class _SampleAppPageState extends State<SampleAppPage> {
-  // Default placeholder text.
-  String textToShow = 'I Like dupa';
-
-  void _updateText() {
-    setState(() {
-      // Update the text.
-      textToShow = 'Flutter is Awesome like shit!';
-    });
-  }
+class Page1 extends StatelessWidget {
+  const Page1({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sample App test'),
-      ),
-      body: Center(child: Text(textToShow)),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _updateText,
-        tooltip: 'Update Text',
-        child: const Icon(Icons.update),
-      ),
-    );
-
-
-  }
-
-  @override
-  Widget build1(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sample App'),
-      ),
+      appBar: AppBar(),
       body: Center(
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.only(left: 20, right: 30),
-          ),
-          onPressed: () {},
-          child: const Text('Hello'),
+          onPressed: () {
+            Navigator.of(context).push(_createRoute());
+          },
+          child: const Text('Go!'),
         ),
+      ),
+    );
+  }
+}
+
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => const Page2(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.0, 1.0);
+      const end = Offset.zero;
+      var curve = Curves.ease;
+
+      final tween = Tween(begin: begin, end: end);
+      final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: curve);
+
+      return SlideTransition(
+          position: tween.animate(curvedAnimation),
+          child: child);
+    },
+  );
+}
+
+
+class Page2 extends StatelessWidget {
+  const Page2({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: const Center(
+        child: Text('Page 2'),
       ),
     );
   }
