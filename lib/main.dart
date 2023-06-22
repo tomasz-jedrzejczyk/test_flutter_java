@@ -1,63 +1,105 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 
 void main() {
-  runApp(
-    const MaterialApp(
-      home: Page1(),
-    ),
-  );
+  runApp(const MaterialApp(home: PhysicsCardDragDemo()));
 }
 
-class Page1 extends StatelessWidget {
-  const Page1({super.key});
+class PhysicsCardDragDemo extends StatelessWidget {
+  const PhysicsCardDragDemo({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).push(_createRoute());
-          },
-          child: const Text('Go!'),
+      body: const DraggableCard(
+        child: FlutterLogo(
+          size: 130,
         ),
       ),
     );
   }
 }
 
-Route _createRoute() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => const Page2(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 1.0);
-      const end = Offset.zero;
-      var curve = Curves.ease;
+class DraggableCard extends StatefulWidget {
+  const DraggableCard({required this.child, super.key});
 
-      final tween = Tween(begin: begin, end: end);
-      final curvedAnimation = CurvedAnimation(
-          parent: animation,
-          curve: curve);
+  final Widget child;
 
-      return SlideTransition(
-          position: tween.animate(curvedAnimation),
-          child: child);
-    },
-  );
+  @override
+  State<DraggableCard> createState() => _DraggableCardState();
 }
 
+class _DraggableCardState extends State<DraggableCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Alignment> _animation;
+  Alignment _dragAlignment = Alignment.center;
 
-class Page2 extends StatelessWidget {
-  const Page2({super.key});
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 1));
+    _controller.addListener(() {
+      setState(() {
+      _dragAlignment = _animation.value;
+    });
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: const Center(
-        child: Text('Page 2'),
+    var size = MediaQuery.of(context).size;
+    return GestureDetector(
+      onPanDown: (details) {
+        _controller.stop();
+      },
+      onPanUpdate: (details) {
+        setState(() {
+          _dragAlignment += Alignment(
+            details.delta.dx / (size.width / 2),
+            details.delta.dy / (size.width / 2),
+          );
+        });
+      },
+      onPanEnd: (details) {
+        _runAnimation(details.velocity.pixelsPerSecond, size);
+      },
+      child: Align(
+        alignment: _dragAlignment,
+        child: Card(
+          child: widget.child,
+        ),
       ),
     );
+  }
+
+  void _runAnimation(Offset pixelPerSecond, Size size) {
+    _animation = _controller.drive(
+      AlignmentTween(
+        begin: _dragAlignment,
+        end: Alignment.center,
+      ),
+    );
+    final unitPerSecondX = pixelPerSecond.dx / size.width;
+    final unitPerSecondY = pixelPerSecond.dy / size.height;
+    final unitPerSecond = Offset(unitPerSecondX, unitPerSecondY);
+    final unitVelocity = unitPerSecond.distance;
+
+    const spring = SpringDescription(
+        mass: 30,
+        stiffness: 1,
+        damping: 1
+    );
+
+    final simulation = SpringSimulation(spring, 0, 1, -unitVelocity);
+
+    _controller.animateWith(simulation);
   }
 }
